@@ -12,6 +12,7 @@ import {
   MessageCircle,
   Package,
 } from "lucide-react";
+import { useState } from "react";
 import { CartIcon } from "./CartIcon";
 import { useAuthStore } from "@/stores/authStore";
 import { useUIStore } from "@/stores/uiStore";
@@ -26,8 +27,8 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const { user } = useAuthStore();
-  const { selectedCity, setSelectedCity, isMobileMenuOpen, toggleMobileMenu } =
-    useUIStore();
+  const { selectedCity, setSelectedCity, isMobileMenuOpen, toggleMobileMenu } = useUIStore();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#E5E7EB] bg-white/90 backdrop-blur-md">
@@ -98,13 +99,37 @@ export function Header() {
 
           {/* Notifications (logged in) */}
           {user && (
-            <Link
-              href="/notifications"
-              className="hidden sm:flex p-2 rounded-lg text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA] transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="h-5 w-5" />
-            </Link>
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="hidden sm:flex p-2 rounded-lg text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA] transition-colors relative"
+                aria-label="Notifications"
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] overflow-hidden z-50 py-2">
+                  <div className="px-4 py-3 border-b border-[#E5E7EB]">
+                    <h3 className="font-bold text-[#111827]">Notifications</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    <div className="px-4 py-3 hover:bg-[#F7F8FA] cursor-pointer">
+                      <p className="text-sm font-medium text-[#111827]">Order ORD-12345 has been confirmed.</p>
+                      <p className="text-xs text-[#6B7280] mt-1">10 minutes ago</p>
+                    </div>
+                    <div className="px-4 py-3 hover:bg-[#F7F8FA] cursor-pointer">
+                      <p className="text-sm font-medium text-[#111827]">Your booking at Silva Associates is tomorrow.</p>
+                      <p className="text-xs text-[#6B7280] mt-1">2 hours ago</p>
+                    </div>
+                  </div>
+                  <div className="px-4 py-2 border-t border-[#E5E7EB] text-center">
+                    <button className="text-sm font-semibold text-[#0D6E6E] hover:underline">Mark all as read</button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Messages (logged in) */}
