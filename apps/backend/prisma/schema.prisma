@@ -10,8 +10,9 @@ datasource db {
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
-  passwordHash String
-  name         String
+  passwordHash       String
+  hashedRefreshToken String?
+  name               String
   phone        String?
   role         String    @default("CUSTOMER") // CUSTOMER, BUSINESS_OWNER, BUSINESS_STAFF, ADMIN
   status       String    @default("ACTIVE")   // ACTIVE, SUSPENDED
