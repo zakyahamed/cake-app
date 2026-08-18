@@ -1,0 +1,93 @@
+export enum UserRole {
+  CUSTOMER = 'CUSTOMER',
+  BUSINESS_OWNER = 'BUSINESS_OWNER',
+  BUSINESS_STAFF = 'BUSINESS_STAFF',
+  ADMIN = 'ADMIN',
+  DELIVERY_PARTNER = 'DELIVERY_PARTNER',
+}
+
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum BusinessStatus {
+  PENDING = 'PENDING',
+  ACTIVE = 'ACTIVE',
+  REJECTED = 'REJECTED',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum ProductStatus {
+  ACTIVE = 'ACTIVE',
+  DRAFT = 'DRAFT',
+  UNLISTED = 'UNLISTED',
+}
+
+export enum OrderStatus {
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
+  PAID = 'PAID',
+  CONFIRMED = 'CONFIRMED',
+  PREPARING = 'PREPARING',
+  READY = 'READY',
+  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  REJECTED = 'REJECTED',
+  REFUNDED = 'REFUNDED',
+}
+
+export enum BookingStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  REJECTED = 'REJECTED',
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+}
+
+export enum FulfilmentMethod {
+  PICKUP = 'PICKUP',
+  BUSINESS_DELIVERY = 'BUSINESS_DELIVERY',
+  PLATFORM_DELIVERY = 'PLATFORM_DELIVERY',
+}
+
+export enum AddressType {
+  HOME = 'HOME',
+  WORK = 'WORK',
+  OTHER = 'OTHER',
+}
+
+export enum DayOfWeek {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY',
+}
+
+export enum NotificationType {
+  ORDER = 'ORDER',
+  PAYMENT = 'PAYMENT',
+  BOOKING = 'BOOKING',
+  MESSAGE = 'MESSAGE',
+  PROMOTION = 'PROMOTION',
+  REVIEW = 'REVIEW',
+  SYSTEM = 'SYSTEM',
+}
+
+export enum VerificationStatus {
+  VERIFIED = 'VERIFIED',
+  PENDING = 'PENDING',
+  UNVERIFIED = 'UNVERIFIED',
+}

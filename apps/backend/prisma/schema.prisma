@@ -1,0 +1,319 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         String    @default("CUSTOMER") // CUSTOMER, BUSINESS_OWNER, BUSINESS_STAFF, ADMIN
+  status       String    @default("ACTIVE")   // ACTIVE, SUSPENDED
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  addresses     Address[]
+  ownedBusiness Business? @relation("BusinessOwner")
+  carts         Cart[]
+  orders        Order[]
+  bookings      Booking[]
+  payments      Payment[]
+  reviews       Review[]
+  notifications Notification[]
+  
+  conversationsAsCustomer Conversation[] @relation("CustomerConversations")
+  messagesSent            Message[]      @relation("MessageSender")
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  userId     String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  icon      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  businessCategories BusinessCategory[]
+  products           Product[]
+  services           Service[]
+}
+
+model Business {
+  id                  String   @id @default(uuid())
+  ownerId             String   @unique
+  slug                String   @unique
+  name                String
+  description         String
+  logoUrl             String?
+  coverUrl            String?
+  status              String   @default("PENDING") // PENDING, ACTIVE, REJECTED, SUSPENDED
+  location            String
+  email               String
+  phone               String
+  isDeliveryAvailable Boolean  @default(false)
+  isPickupAvailable   Boolean  @default(true)
+  rating              Float    @default(0.0)
+  reviewCount         Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  owner              User               @relation("BusinessOwner", fields: [ownerId], references: [id])
+  businessCategories BusinessCategory[]
+  products           Product[]
+  services           Service[]
+  orders             Order[]
+  bookings           Booking[]
+  reviews            Review[]
+  conversations      Conversation[]     @relation("BusinessConversations")
+}
+
+model BusinessCategory {
+  id         String   @id @default(uuid())
+  businessId String
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, categoryId])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  businessId  String
+  categoryId  String
+  name        String
+  description String
+  price       Float
+  imageUrl    String?
+  status      String   @default("ACTIVE") // ACTIVE, DRAFT, UNLISTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category Category         @relation(fields: [categoryId], references: [id])
+  variants ProductVariant[]
+  cartItems CartItem[]
+  orderItems OrderItem[]
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid())
+  productId String
+  name      String
+  price     Float
+  createdAt DateTime @default(now())
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  businessId  String
+  categoryId  String
+  name        String
+  description String
+  price       Float
+  duration    Int      // Duration in minutes
+  imageUrl    String?
+  status      String   @default("ACTIVE") // ACTIVE, DRAFT, UNLISTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business  Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category  Category   @relation(fields: [categoryId], references: [id])
+  cartItems CartItem[]
+  bookings  Booking[]
+}
+
+model Cart {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+}
+
+model CartItem {
+  id         String   @id @default(uuid())
+  cartId     String
+  productId  String?
+  serviceId  String?
+  variantId  String?
+  quantity   Int      @default(1)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  cart    Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  service Service?        @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+}
+
+model Order {
+  id               String   @id @default(uuid())
+  userId           String
+  businessId       String
+  status           String   @default("PENDING_PAYMENT") // PENDING_PAYMENT, PAID, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, COMPLETED, CANCELLED, REJECTED, REFUNDED
+  subtotal         Float
+  deliveryFee      Float    @default(0.0)
+  total            Float
+  fulfilmentMethod String   // PICKUP, BUSINESS_DELIVERY, PLATFORM_DELIVERY
+  scheduledDate    String?
+  scheduledTime    String?
+  notes            String?
+  addressId        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id])
+  business      Business       @relation(fields: [businessId], references: [id])
+  address       Address?       @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  items         OrderItem[]
+  payments      Payment[]
+  reviews       Review[]
+  conversations Conversation[]
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  productId   String
+  variantId   String?
+  quantity    Int
+  priceAtTime Float
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id])
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+}
+
+model Booking {
+  id            String   @id @default(uuid())
+  userId        String
+  businessId    String
+  serviceId     String
+  status        String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED, REJECTED
+  scheduledDate String
+  scheduledTime String
+  priceAtTime   Float
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id])
+  business Business  @relation(fields: [businessId], references: [id])
+  service  Service   @relation(fields: [serviceId], references: [id])
+  payments Payment[]
+  reviews  Review[]
+}
+
+model Payment {
+  id                    String   @id @default(uuid())
+  userId                String
+  orderId               String?
+  bookingId             String?
+  status                String   @default("PENDING") // PENDING, PROCESSING, SUCCEEDED, FAILED, CANCELLED, REFUNDED
+  amount                Float
+  provider              String   // STRIPE, PAYPAL, etc.
+  providerTransactionId String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id])
+  order   Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+}
+
+model Conversation {
+  id         String   @id @default(uuid())
+  customerId String
+  businessId String
+  orderId    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer User      @relation("CustomerConversations", fields: [customerId], references: [id], onDelete: Cascade)
+  business Business  @relation("BusinessConversations", fields: [businessId], references: [id], onDelete: Cascade)
+  order    Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@unique([customerId, businessId, orderId])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  userId     String
+  businessId String
+  orderId    String?
+  bookingId  String?
+  rating     Int      // 1 to 5
+  content    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  order    Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  // Ensure a user can only leave one review per transaction
+  @@unique([userId, orderId])
+  @@unique([userId, bookingId])
+}
+
+model Notification {
+  id              String   @id @default(uuid())
+  userId          String
+  type            String   // ORDER, PAYMENT, BOOKING, MESSAGE, PROMOTION, REVIEW, SYSTEM
+  title           String
+  message         String
+  isRead          Boolean  @default(false)
+  relatedEntityId String?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
