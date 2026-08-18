@@ -24,4 +24,50 @@ export class UsersService {
       data: { hashedRefreshToken },
     });
   }
+
+  async updateUser(userId: string, data: Prisma.UserUpdateInput): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  async getAddresses(userId: string) {
+    return this.prisma.address.findMany({
+      where: { userId },
+    });
+  }
+
+  async getAddressById(addressId: string) {
+    return this.prisma.address.findUnique({
+      where: { id: addressId },
+    });
+  }
+
+  async createAddress(userId: string, data: any) {
+    return this.prisma.address.create({
+      data: {
+        ...data,
+        line1: data.line1 || '',
+        city: data.city || '',
+        state: data.state || '',
+        postalCode: data.postalCode || '',
+        country: data.country || '',
+        user: { connect: { id: userId } },
+      },
+    });
+  }
+
+  async updateAddress(addressId: string, data: Prisma.AddressUpdateInput) {
+    return this.prisma.address.update({
+      where: { id: addressId },
+      data,
+    });
+  }
+
+  async deleteAddress(addressId: string) {
+    return this.prisma.address.delete({
+      where: { id: addressId },
+    });
+  }
 }
