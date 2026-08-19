@@ -10,6 +10,7 @@ import { BusinessesModule } from './businesses/businesses.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { ServicesModule } from './services/services.module';
+import { SearchModule } from './search/search.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -24,6 +25,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     CategoriesModule,
     ProductsModule,
     ServicesModule,
+    SearchModule,
     HealthModule,
   ],
   controllers: [AppController],
