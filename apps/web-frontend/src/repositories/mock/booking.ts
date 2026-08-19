@@ -31,6 +31,11 @@ export class MockBookingRepository implements BookingRepository {
     return paginate(results, query?.page, query?.limit);
   }
 
+  async getBusinessBookings(businessId: string): Promise<Booking[]> {
+    await delay(200);
+    return bookings.filter(b => b.businessId === businessId);
+  }
+
   async getBookingById(id: string): Promise<Booking | null> {
     await delay(200);
     return bookings.find((b) => b.id === id) ?? null;

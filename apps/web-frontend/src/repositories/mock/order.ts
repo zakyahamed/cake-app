@@ -34,6 +34,11 @@ export class MockOrderRepository implements OrderRepository {
     return paginate(results, query?.page, query?.limit);
   }
 
+  async getBusinessOrders(businessId: string): Promise<Order[]> {
+    await delay(200);
+    return orders.filter(o => o.businessId === businessId);
+  }
+
   async getOrderById(id: string): Promise<Order | null> {
     await delay(200);
     return orders.find((o) => o.id === id) ?? null;

@@ -1,0 +1,98 @@
+
+> @cake-app/web-frontend@0.1.0 build
+> next build
+
+▲ Next.js 16.3.1 (Turbopack)
+✓ Running next.config.ts took 23ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1133ms
+  Running TypeScript ...
+  Finished TypeScript in 2.3s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/33) ...
+  Generating static pages using 7 workers (8/33) 
+  Generating static pages using 7 workers (16/33) 
+  Generating static pages using 7 workers (24/33) 
+✓ Generating static pages using 7 workers (33/33) in 489ms
+Turbopack build encountered 2 warnings:
+./packages/common/dist/index.js
+Warning: unexpected export *
+export * used with module [project]/packages/common/dist/index.js [app-client] (ecmascript) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  Client Component Browser:
+    ./packages/common/dist/index.js [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./packages/common/dist/index.js [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+
+./packages/common/dist/index.js
+Warning: unexpected export *
+export * used with module [project]/packages/common/dist/index.js [app-ssr] (ecmascript) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  Client Component Browser:
+    ./packages/common/dist/index.js [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./packages/common/dist/index.js [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin
+├ ○ /admin/businesses/pending
+├ ○ /admin/reviews
+├ ○ /admin/users
+├ ○ /bookings
+├ ƒ /bookings/[id]
+├ ○ /business-dashboard
+├ ○ /business-dashboard/bookings
+├ ○ /business-dashboard/orders
+├ ○ /business-dashboard/products
+├ ○ /business-dashboard/services
+├ ○ /business-dashboard/settings
+├ ƒ /business/[slug]
+├ ○ /cart
+├ ○ /categories
+├ ƒ /categories/[slug]
+├ ○ /checkout
+├ ○ /checkout/success
+├ ○ /forgot-password
+├ ○ /login
+├ ○ /messages
+├ ƒ /messages/[id]
+├ ○ /notifications
+├ ○ /orders
+├ ƒ /orders/[id]
+├ ƒ /product/[id]
+├ ○ /profile
+├ ○ /profile/addresses
+├ ○ /profile/bookings
+├ ○ /profile/orders
+├ ○ /profile/reviews
+├ ○ /profile/settings
+├ ○ /register
+├ ○ /reset-password
+├ ○ /search
+└ ƒ /service/[id]
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

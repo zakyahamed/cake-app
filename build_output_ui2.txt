@@ -1,0 +1,55 @@
+
+> @cake-app/web-frontend@0.1.0 build
+> next build
+
+▲ Next.js 16.3.1 (Turbopack)
+✓ Running next.config.ts took 81ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1258ms
+  Running TypeScript ...
+src/repositories/mock/booking.ts(18,14): error TS2420: Class 'MockBookingRepository' incorrectly implements interface 'BookingRepository'.
+  Property 'getBusinessBookings' is missing in type 'MockBookingRepository' but required in type 'BookingRepository'.
+src/repositories/mock/order.ts(19,14): error TS2420: Class 'MockOrderRepository' incorrectly implements interface 'OrderRepository'.
+  Property 'getBusinessOrders' is missing in type 'MockOrderRepository' but required in type 'OrderRepository'.
+Failed to type check.
+
+Turbopack build encountered 2 warnings:
+./packages/common/dist/index.js
+Warning: unexpected export *
+export * used with module [project]/packages/common/dist/index.js [app-client] (ecmascript) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  Client Component Browser:
+    ./packages/common/dist/index.js [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./packages/common/dist/index.js [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+
+./packages/common/dist/index.js
+Warning: unexpected export *
+export * used with module [project]/packages/common/dist/index.js [app-ssr] (ecmascript) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  Client Component Browser:
+    ./packages/common/dist/index.js [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component Browser]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./packages/common/dist/index.js [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Client Component SSR]
+    ./apps/web-frontend/src/app/business-dashboard/layout.tsx [Server Component]
+
+
+npm error Lifecycle script `build` failed with error:
+npm error Error: command failed
+npm error   in workspace: @cake-app/web-frontend@0.1.0
+npm error   at location: /Users/zaky/Downloads/cake-app/apps/web-frontend

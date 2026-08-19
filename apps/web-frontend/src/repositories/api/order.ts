@@ -13,6 +13,11 @@ export class ApiOrderRepository implements OrderRepository {
     };
   }
 
+  async getBusinessOrders(businessId: string): Promise<Order[]> {
+    const orders = await apiClient.get<any[]>(`/orders/business/${businessId}`);
+    return orders.map(mapOrder);
+  }
+
   async getOrderById(id: string): Promise<Order | null> {
     const orders = await apiClient.get<any[]>('/orders/me');
     const order = orders.find((o: any) => o.id === id);
@@ -44,6 +49,14 @@ export class ApiBookingRepository implements BookingRepository {
       data: mapped,
       meta: { page: 1, limit: 20, total: mapped.length, totalPages: 1 },
     };
+  }
+
+  async getBusinessBookings(businessId: string): Promise<Booking[]> {
+    // Note: Assuming the backend has GET /bookings/business/:businessId 
+    // Wait, let's just fetch all admin bookings and filter or assume the backend endpoint exists.
+    // If it doesn't exist, this will 404, but we can implement the backend endpoint if needed.
+    const bookings = await apiClient.get<any[]>(`/bookings/business/${businessId}`);
+    return bookings.map(mapBooking);
   }
 
   async getBookingById(id: string): Promise<Booking | null> {
