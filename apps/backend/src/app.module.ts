@@ -11,6 +11,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { ServicesModule } from './services/services.module';
 import { SearchModule } from './search/search.module';
+import { CartModule } from './cart/cart.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -26,6 +27,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     ProductsModule,
     ServicesModule,
     SearchModule,
+    CartModule,
     HealthModule,
   ],
   controllers: [AppController],
