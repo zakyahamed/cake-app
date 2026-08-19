@@ -13,6 +13,7 @@ import { ServicesModule } from './services/services.module';
 import { SearchModule } from './search/search.module';
 import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
+import { BookingsModule } from './bookings/bookings.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -30,6 +31,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     SearchModule,
     CartModule,
     OrdersModule,
+    BookingsModule,
     HealthModule,
   ],
   controllers: [AppController],
