@@ -1,0 +1,53 @@
+
+> @cake-app/web-frontend@0.1.0 build
+> next build
+
+▲ Next.js 16.3.1 (Turbopack)
+✓ Running next.config.ts took 24ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 711ms
+  Running TypeScript ...
+src/app/business-dashboard/page.tsx(6,15): error TS2305: Module '"@/domain/types"' has no exported member 'BusinessDashboardStats'.
+src/repositories/api/admin.ts(30,38): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type 'User'.
+Failed to type check.
+
+Turbopack build encountered 2 warnings:
+./packages/common/dist/index.js
+Warning: unexpected export *
+export * used with module [project]/packages/common/dist/index.js [app-client] (ecmascript) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  Client Component Browser:
+    ./packages/common/dist/index.js [Client Component Browser]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Client Component Browser]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./packages/common/dist/index.js [Client Component SSR]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Client Component SSR]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Server Component]
+
+
+./packages/common/dist/index.js
+Warning: unexpected export *
+export * used with module [project]/packages/common/dist/index.js [app-ssr] (ecmascript) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  Client Component Browser:
+    ./packages/common/dist/index.js [Client Component Browser]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Client Component Browser]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./packages/common/dist/index.js [Client Component SSR]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Client Component SSR]
+    ./apps/web-frontend/src/app/checkout/page.tsx [Server Component]
+
+
+npm error Lifecycle script `build` failed with error:
+npm error Error: command failed
+npm error   in workspace: @cake-app/web-frontend@0.1.0
+npm error   at location: /Users/zaky/Downloads/cake-app/apps/web-frontend

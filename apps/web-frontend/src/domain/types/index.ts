@@ -59,6 +59,7 @@ export interface User {
   phone: string;
   avatar?: string;
   role: UserRole;
+  status?: string;
   addresses: Address[];
   createdAt: string;
 }

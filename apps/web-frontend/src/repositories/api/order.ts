@@ -68,7 +68,7 @@ export class ApiBookingRepository implements BookingRepository {
   }
 }
 
-function mapOrder(o: any): Order {
+export function mapOrder(o: any): Order {
   return {
     id: o.id,
     customerId: o.userId,
@@ -86,7 +86,7 @@ function mapOrder(o: any): Order {
   };
 }
 
-function mapBooking(b: any): Booking {
+export function mapBooking(b: any): Booking {
   return {
     id: b.id, customerId: b.userId, businessId: b.businessId,
     serviceId: b.serviceId, date: b.scheduledDate, time: b.scheduledTime,

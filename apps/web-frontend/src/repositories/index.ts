@@ -7,6 +7,8 @@ import { ApiProductRepository, ApiServiceRepository, ApiSearchRepository } from 
 import { ApiOrderRepository, ApiBookingRepository } from "./api/order";
 import { ApiReviewRepository, ApiMessageRepository, ApiNotificationRepository } from "./api/social";
 import { ApiAuthRepository } from "./api/auth";
+import { ApiAdminRepository } from "./api/admin";
+import { ApiOperationsRepository } from "./api/operations";
 
 export const categoryRepository = new ApiCategoryRepository();
 export const businessRepository = new ApiBusinessRepository();
@@ -19,6 +21,8 @@ export const reviewRepository = new ApiReviewRepository();
 export const messageRepository = new ApiMessageRepository();
 export const notificationRepository = new ApiNotificationRepository();
 export const authRepository = new ApiAuthRepository();
+export const adminRepository = new ApiAdminRepository();
+export const operationsRepository = new ApiOperationsRepository();
 
 // Re-export interfaces so features can import them from one place
 export type { CategoryRepository, BusinessRepository } from "./interfaces/business";
@@ -26,3 +30,5 @@ export type { ProductRepository, ServiceRepository, SearchRepository } from "./i
 export type { OrderRepository, BookingRepository } from "./interfaces/order";
 export type { ReviewRepository, MessageRepository, NotificationRepository } from "./interfaces/review";
 export type { AuthRepository } from "./interfaces/auth";
+export type { AdminRepository } from "./interfaces/admin";
+export type { OperationsRepository } from "./interfaces/operations";
