@@ -29,8 +29,18 @@ function LoginForm() {
   const onSubmit = async (data: LoginInput) => {
     try {
       setGlobalError(null);
-      await login(data);
-      router.push(callbackUrl);
+      const user = await login(data);
+      
+      // If there's a specific callback, use it. Otherwise, route based on role.
+      if (searchParams.get("callbackUrl")) {
+        router.push(callbackUrl);
+      } else if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else if (user.role === "BUSINESS_OWNER") {
+        router.push("/business-dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message);
@@ -111,10 +121,11 @@ function LoginForm() {
 
         {/* Development Helper */}
         {process.env.NODE_ENV === "development" && (
-          <div className="mt-8 p-4 bg-[#F7F8FA] rounded-lg text-xs text-[#6B7280] border border-[#E5E7EB]">
-            <p className="font-semibold text-[#374151] mb-1">Dev Account Shortcut:</p>
-            <p>Email: customer@example.com</p>
-            <p>Password: password</p>
+          <div className="mt-8 p-4 bg-[#F7F8FA] rounded-lg text-xs text-[#6B7280] border border-[#E5E7EB] space-y-1">
+            <p className="font-semibold text-[#374151] mb-2">Test Accounts (password123):</p>
+            <p>Admin: admin@cake.com</p>
+            <p>Business: jane@bakery.com</p>
+            <p>Customer: customer@test.com</p>
           </div>
         )}
       </div>

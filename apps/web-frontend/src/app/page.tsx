@@ -97,7 +97,7 @@ export default function Home() {
               ))}
             </div>
           )}
-          
+
           <Link
             href="/categories"
             className="sm:hidden mt-6 flex justify-center items-center text-sm font-semibold text-[#0D6E6E]"
@@ -150,7 +150,7 @@ export default function Home() {
                 <Button variant="secondary" size="lg" className="w-full sm:w-auto text-[#0D6E6E] bg-white hover:bg-gray-50">
                   Register Business
                 </Button>
-                <Button variant="outline" size="lg" className="w-full sm:w-auto text-white border-white/30 hover:bg-white/10">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto text-[#0D6E6E] border-white/30 hover:bg-white/10 hover:text-white">
                   Learn More
                 </Button>
               </div>
