@@ -19,6 +19,7 @@ import { MessagingModule } from './messaging/messaging.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { OperationsModule } from './operations/operations.module';
+import { AdminModule } from './admin/admin.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -42,6 +43,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     NotificationsModule,
     ReviewsModule,
     OperationsModule,
+    AdminModule,
     HealthModule,
   ],
   controllers: [AppController],
