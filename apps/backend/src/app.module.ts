@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { BusinessesModule } from './businesses/businesses.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
+import { ServicesModule } from './services/services.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -20,6 +22,8 @@ import { RolesGuard } from './common/guards/roles.guard';
     AuthModule,
     BusinessesModule,
     CategoriesModule,
+    ProductsModule,
+    ServicesModule,
     HealthModule,
   ],
   controllers: [AppController],
