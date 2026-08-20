@@ -4,6 +4,8 @@ import { useBookings } from "@/features/profile/hooks";
 import { LoadingState, EmptyState } from "@/components/ui/States";
 import { Calendar, Clock, CheckCircle2, XCircle } from "lucide-react";
 import type { BookingStatus } from "@/domain/enums";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
 
 const statusConfig: Record<BookingStatus, { color: string; bg: string; icon: React.ElementType }> = {
   PENDING: { color: "text-orange-600", bg: "bg-orange-50", icon: Clock },
@@ -14,6 +16,7 @@ const statusConfig: Record<BookingStatus, { color: string; bg: string; icon: Rea
 };
 
 export default function BookingsPage() {
+  const router = useRouter();
   const { data: bookingsResult, isLoading } = useBookings();
 
   if (isLoading) return <LoadingState message="Loading your bookings..." className="py-20" />;
@@ -25,11 +28,18 @@ export default function BookingsPage() {
       <h1 className="text-2xl font-bold text-[#111827]">Appointments</h1>
       
       {bookings.length === 0 ? (
-        <EmptyState
-          title="No bookings yet"
-          description="When you schedule an appointment, it will appear here."
-          icon={<Calendar className="h-10 w-10 text-gray-400" />}
-        />
+        <div className="py-12">
+          <EmptyState
+            title="No bookings yet"
+            description="When you schedule an appointment, it will appear here. Looking to book a service?"
+            icon={<Calendar className="h-12 w-12 text-gray-300" />}
+            action={
+              <Button onClick={() => router.push("/search")}>
+                Find Services
+              </Button>
+            }
+          />
+        </div>
       ) : (
         <div className="space-y-4">
           {bookings.map((booking) => {

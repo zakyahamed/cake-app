@@ -18,6 +18,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useUIStore } from "@/stores/uiStore";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { href: "/categories", label: "Categories" },
@@ -185,50 +186,58 @@ export function Header() {
       </div>
 
       {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-[#E5E7EB] bg-white px-4 py-3 space-y-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={toggleMobileMenu}
-              className={cn(
-                "flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                pathname.startsWith(link.href)
-                  ? "text-[#0D6E6E] bg-[#0D6E6E]/5"
-                  : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-          {user && (
-            <>
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden border-t border-[#E5E7EB] bg-white px-4 py-3 space-y-1 overflow-hidden"
+          >
+            {navLinks.map((link) => (
               <Link
-                href="/orders"
+                key={link.href}
+                href={link.href}
                 onClick={toggleMobileMenu}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
+                className={cn(
+                  "flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  pathname.startsWith(link.href)
+                    ? "text-[#0D6E6E] bg-[#0D6E6E]/5"
+                    : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
+                )}
               >
-                <Package className="h-4 w-4" /> Orders
+                {link.label}
               </Link>
-              <Link
-                href="/messages"
-                onClick={toggleMobileMenu}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
-              >
-                <MessageCircle className="h-4 w-4" /> Messages
-              </Link>
-              <Link
-                href="/notifications"
-                onClick={toggleMobileMenu}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
-              >
-                <Bell className="h-4 w-4" /> Notifications
-              </Link>
-            </>
-          )}
-        </div>
-      )}
+            ))}
+            {user && (
+              <>
+                <Link
+                  href="/orders"
+                  onClick={toggleMobileMenu}
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
+                >
+                  <Package className="h-4 w-4" /> Orders
+                </Link>
+                <Link
+                  href="/messages"
+                  onClick={toggleMobileMenu}
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
+                >
+                  <MessageCircle className="h-4 w-4" /> Messages
+                </Link>
+                <Link
+                  href="/notifications"
+                  onClick={toggleMobileMenu}
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F7F8FA]"
+                >
+                  <Bell className="h-4 w-4" /> Notifications
+                </Link>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

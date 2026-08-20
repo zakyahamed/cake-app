@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['cakeapp-web-front.loca.lt'],
   images: {
     remotePatterns: [
       {

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Plus, Package, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
+import { FileUpload } from "@/components/ui/FileUpload";
 
 export default function BusinessProductsPage() {
   const { user } = useAuthStore();
@@ -80,8 +81,15 @@ export default function BusinessProductsPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-              <input type="url" className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary h-10 px-3 border" placeholder="https://..." />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+              <FileUpload
+                directory={`products/${business?.id || 'general'}`}
+                onUploadSuccess={(url) => {
+                  toast.success("Image uploaded!");
+                  // Here we would normally save the URL to form state
+                  console.log("Uploaded URL:", url);
+                }}
+              />
             </div>
           </div>
           
