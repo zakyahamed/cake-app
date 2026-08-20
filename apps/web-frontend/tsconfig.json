@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@cake-app/common": ["../../packages/common/src/index.ts"]
     }
   },
   "include": [
