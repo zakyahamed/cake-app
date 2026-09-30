@@ -1,38 +1,39 @@
 import { useMutation } from "@tanstack/react-query";
-import type { Order, Booking } from "@/domain/types";
-// In a real app, this would be an API call
-// For this mock, we just resolve successfully after a delay
+import type {
+  CreateBookingInput,
+  CreateOrderInput,
+} from "@/repositories/interfaces/order";
+import {
+  bookingRepository,
+  orderRepository,
+  paymentRepository,
+} from "@/repositories";
 
 export function useSubmitOrder() {
   return useMutation({
-    mutationFn: async (orderData: Partial<Order>) => {
-      return new Promise<Order>((resolve) => {
-        setTimeout(() => {
-          resolve({
-            id: `ORD-${Math.floor(Math.random() * 1000000)}`,
-            ...orderData,
-            status: "PENDING_PAYMENT",
-            createdAt: new Date().toISOString(),
-          } as Order);
-        }, 1500);
-      });
+    mutationFn: async (orderData: CreateOrderInput) => {
+      return orderRepository.createOrder(orderData);
     },
   });
 }
 
 export function useSubmitBooking() {
   return useMutation({
-    mutationFn: async (bookingData: Partial<Booking>) => {
-      return new Promise<Booking>((resolve) => {
-        setTimeout(() => {
-          resolve({
-            id: `BKG-${Math.floor(Math.random() * 1000000)}`,
-            ...bookingData,
-            status: "PENDING",
-            createdAt: new Date().toISOString(),
-          } as Booking);
-        }, 1500);
-      });
+    mutationFn: async (bookingData: CreateBookingInput) => {
+      return bookingRepository.createBooking(bookingData);
     },
+  });
+}
+
+export function useCreatePaymentIntent() {
+  return useMutation({
+    mutationFn: paymentRepository.createIntent.bind(paymentRepository),
+  });
+}
+
+export function useConfirmPayment() {
+  return useMutation({
+    mutationFn: (input: { paymentId: string; providerTransactionId: string }) =>
+      paymentRepository.confirm(input.paymentId, input.providerTransactionId),
   });
 }

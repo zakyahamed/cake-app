@@ -15,15 +15,17 @@ export class CartService {
             product: true,
             service: true,
             variant: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!cart) {
       cart = await this.prisma.cart.create({
         data: { userId },
-        include: { items: { include: { product: true, service: true, variant: true } } }
+        include: {
+          items: { include: { product: true, service: true, variant: true } },
+        },
       });
     }
 
@@ -32,6 +34,28 @@ export class CartService {
 
   async addItem(userId: string, dto: AddCartItemDto) {
     const cart = await this.getCart(userId);
+
+    if (!dto.productId && !dto.serviceId) {
+      throw new NotFoundException('A product or service is required');
+    }
+
+    const existing = await this.prisma.cartItem.findFirst({
+      where: {
+        cartId: cart.id,
+        ...(dto.productId
+          ? { productId: dto.productId }
+          : { serviceId: dto.serviceId }),
+        ...(dto.variantId ? { variantId: dto.variantId } : {}),
+      },
+    });
+
+    if (existing) {
+      return this.prisma.cartItem.update({
+        where: { id: existing.id },
+        data: { quantity: existing.quantity + dto.quantity, notes: dto.notes },
+        include: { product: true, service: true, variant: true },
+      });
+    }
 
     // Basic MVP cart logic
     return this.prisma.cartItem.create({
@@ -43,11 +67,16 @@ export class CartService {
         quantity: dto.quantity,
         notes: dto.notes,
       },
+      include: { product: true, service: true, variant: true },
     });
   }
 
   async updateItem(userId: string, itemId: string, dto: UpdateCartItemDto) {
-    // Ideally we verify the item belongs to the user's cart, but this is a secure environment.
+    const item = await this.prisma.cartItem.findFirst({
+      where: { id: itemId, cart: { userId } },
+    });
+    if (!item) throw new NotFoundException('Cart item not found');
+
     return this.prisma.cartItem.update({
       where: { id: itemId },
       data: dto,
@@ -55,6 +84,11 @@ export class CartService {
   }
 
   async removeItem(userId: string, itemId: string) {
+    const item = await this.prisma.cartItem.findFirst({
+      where: { id: itemId, cart: { userId } },
+    });
+    if (!item) throw new NotFoundException('Cart item not found');
+
     return this.prisma.cartItem.delete({
       where: { id: itemId },
     });

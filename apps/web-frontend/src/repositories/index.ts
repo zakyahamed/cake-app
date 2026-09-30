@@ -3,12 +3,22 @@
 // ---------------------------------------------------------------------------
 
 import { ApiCategoryRepository, ApiBusinessRepository } from "./api/business";
-import { ApiProductRepository, ApiServiceRepository, ApiSearchRepository } from "./api/product";
+import {
+  ApiProductRepository,
+  ApiServiceRepository,
+  ApiSearchRepository,
+} from "./api/product";
 import { ApiOrderRepository, ApiBookingRepository } from "./api/order";
-import { ApiReviewRepository, ApiMessageRepository, ApiNotificationRepository } from "./api/social";
+import {
+  ApiReviewRepository,
+  ApiMessageRepository,
+  ApiNotificationRepository,
+} from "./api/social";
 import { ApiAuthRepository } from "./api/auth";
 import { ApiAdminRepository } from "./api/admin";
 import { ApiOperationsRepository } from "./api/operations";
+import { ApiCartRepository } from "./api/cart";
+import { ApiPaymentRepository } from "./api/payment";
 
 export const categoryRepository = new ApiCategoryRepository();
 export const businessRepository = new ApiBusinessRepository();
@@ -23,12 +33,27 @@ export const notificationRepository = new ApiNotificationRepository();
 export const authRepository = new ApiAuthRepository();
 export const adminRepository = new ApiAdminRepository();
 export const operationsRepository = new ApiOperationsRepository();
+export const cartRepository = new ApiCartRepository();
+export const paymentRepository = new ApiPaymentRepository();
 
 // Re-export interfaces so features can import them from one place
-export type { CategoryRepository, BusinessRepository } from "./interfaces/business";
-export type { ProductRepository, ServiceRepository, SearchRepository } from "./interfaces/product";
+export type {
+  CategoryRepository,
+  BusinessRepository,
+} from "./interfaces/business";
+export type {
+  ProductRepository,
+  ServiceRepository,
+  SearchRepository,
+} from "./interfaces/product";
 export type { OrderRepository, BookingRepository } from "./interfaces/order";
-export type { ReviewRepository, MessageRepository, NotificationRepository } from "./interfaces/review";
+export type {
+  ReviewRepository,
+  MessageRepository,
+  NotificationRepository,
+} from "./interfaces/review";
 export type { AuthRepository } from "./interfaces/auth";
 export type { AdminRepository } from "./interfaces/admin";
 export type { OperationsRepository } from "./interfaces/operations";
+export type { CartRepository } from "./interfaces/cart";
+export type { PaymentRepository } from "./interfaces/payment";

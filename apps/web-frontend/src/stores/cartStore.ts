@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem } from "@/domain/types";
+import { cartRepository } from "@/repositories";
 
 interface CartStore {
   items: CartItem[];
@@ -25,7 +26,7 @@ export const useCartStore = create<CartStore>()(
           (i) =>
             i.productId === item.productId &&
             i.variantId === item.variantId &&
-            i.businessId === item.businessId
+            i.businessId === item.businessId,
         );
 
         if (existingIndex !== -1) {
@@ -34,16 +35,40 @@ export const useCartStore = create<CartStore>()(
             items: state.items.map((i, idx) =>
               idx === existingIndex
                 ? { ...i, quantity: i.quantity + item.quantity }
-                : i
+                : i,
             ),
           }));
+          const existingItem = get().items[existingIndex];
+          if (existingItem) {
+            void cartRepository
+              .updateItem(existingItem.id, existingItem.quantity)
+              .catch(() => undefined);
+          }
         } else {
-          set((state) => ({ items: [...state.items, { ...item, id }] }));
+          const optimisticItem = { ...item, id };
+          set((state) => ({ items: [...state.items, optimisticItem] }));
+          void cartRepository
+            .addItem(item)
+            .then((savedItem) => {
+              set((state) => ({
+                items: state.items.map((current) =>
+                  current.id === id ? savedItem : current,
+                ),
+              }));
+            })
+            .catch(() => {
+              set((state) => ({
+                items: state.items.filter((current) => current.id !== id),
+              }));
+            });
         }
       },
 
-      removeItem: (itemId) =>
-        set((state) => ({ items: state.items.filter((i) => i.id !== itemId) })),
+      removeItem: (itemId) => {
+        set((state) => ({ items: state.items.filter((i) => i.id !== itemId) }));
+        if (!itemId.startsWith("cart-"))
+          void cartRepository.removeItem(itemId).catch(() => undefined);
+      },
 
       updateQuantity: (itemId, quantity) => {
         if (quantity < 1) {
@@ -51,8 +76,14 @@ export const useCartStore = create<CartStore>()(
           return;
         }
         set((state) => ({
-          items: state.items.map((i) => (i.id === itemId ? { ...i, quantity } : i)),
+          items: state.items.map((i) =>
+            i.id === itemId ? { ...i, quantity } : i,
+          ),
         }));
+        if (!itemId.startsWith("cart-"))
+          void cartRepository
+            .updateItem(itemId, quantity)
+            .catch(() => undefined);
       },
 
       clearCart: () => set({ items: [] }),
@@ -60,11 +91,10 @@ export const useCartStore = create<CartStore>()(
       getSubtotal: () =>
         get().items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0),
 
-      getTotalItems: () =>
-        get().items.reduce((sum, i) => sum + i.quantity, 0),
+      getTotalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
     }),
     {
       name: "marketplace-cart",
-    }
-  )
+    },
+  ),
 );
