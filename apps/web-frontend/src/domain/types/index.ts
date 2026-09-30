@@ -305,6 +305,7 @@ export interface Conversation {
   relatedBookingId?: string;
   createdAt: string;
   updatedAt: string;
+  businessName?: string;
 }
 
 // ---------------------------------------------------------------------------

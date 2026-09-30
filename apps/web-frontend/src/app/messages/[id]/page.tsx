@@ -1,30 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { LoadingState, ErrorState } from "@/components/ui/States";
+import { messageRepository } from "@/repositories";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function MessageThreadPage() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hi, I would like to customize the design for the cake.", sender: "user", time: "10:00 AM" },
-    { id: 2, text: "Hello! Sure, please let me know what you have in mind.", sender: "business", time: "10:15 AM" },
-    { id: 3, text: "Can you do a floral pattern with blue icing?", sender: "user", time: "10:20 AM" },
-    { id: 4, text: "Yes, I can do that design!", sender: "business", time: "10:30 AM" },
-  ]);
+  const messages = useQuery({
+    queryKey: ["messages", params.id],
+    queryFn: () => messageRepository.getMessages(params.id),
+  });
+  const sendMessage = useMutation({
+    mutationFn: (content: string) =>
+      messageRepository.sendMessage(params.id, content),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["messages", params.id] }),
+  });
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
 
-    setMessages([...messages, {
-      id: Date.now(),
-      text: message,
-      sender: "user",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }]);
+    sendMessage.mutate(message);
     setMessage("");
   };
 
@@ -32,35 +38,54 @@ export default function MessageThreadPage() {
     <div className="max-w-3xl mx-auto min-h-[calc(100vh-64px)] flex flex-col bg-white border-x border-[#E5E7EB]">
       {/* Chat Header */}
       <div className="h-16 border-b border-[#E5E7EB] flex items-center px-4 shrink-0 bg-white sticky top-16 z-10">
-        <button 
+        <button
           onClick={() => router.back()}
           className="p-2 mr-2 rounded-lg text-[#6B7280] hover:bg-[#F7F8FA] transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="h-10 w-10 rounded-full bg-[#0D6E6E]/10 flex items-center justify-center text-[#0D6E6E] font-bold mr-3">
-          N
+          B
         </div>
         <div>
-          <h2 className="font-bold text-[#111827]">Nuha Henna Art</h2>
-          <p className="text-xs text-green-600">Online</p>
+          <h2 className="font-bold text-[#111827]">Business conversation</h2>
+          <p className="text-xs text-[#6B7280]">Conversation</p>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#F7F8FA]">
-        {messages.map((msg) => {
-          const isUser = msg.sender === "user";
+        {messages.isLoading && (
+          <LoadingState message="Loading conversation..." />
+        )}
+        {messages.isError && (
+          <ErrorState
+            message="We could not load this conversation."
+            onRetry={() => messages.refetch()}
+          />
+        )}
+        {messages.data?.map((msg) => {
+          const isUser = msg.senderId === user?.id;
           return (
-            <div key={msg.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                isUser 
-                  ? 'bg-[#0D6E6E] text-white rounded-br-sm' 
-                  : 'bg-white border border-[#E5E7EB] text-[#111827] rounded-bl-sm'
-              }`}>
-                <p className="text-sm">{msg.text}</p>
+            <div
+              key={msg.id}
+              className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
+            >
+              <div
+                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                  isUser
+                    ? "bg-[#0D6E6E] text-white rounded-br-sm"
+                    : "bg-white border border-[#E5E7EB] text-[#111827] rounded-bl-sm"
+                }`}
+              >
+                <p className="text-sm">{msg.content}</p>
               </div>
-              <span className="text-xs text-[#9CA3AF] mt-1 mx-1">{msg.time}</span>
+              <span className="text-xs text-[#9CA3AF] mt-1 mx-1">
+                {new Date(msg.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
           );
         })}
@@ -76,7 +101,11 @@ export default function MessageThreadPage() {
             placeholder="Type your message..."
             className="flex-1 h-12 px-4 rounded-xl border border-[#E5E7EB] bg-[#F7F8FA] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0D6E6E]"
           />
-          <Button type="submit" className="h-12 px-6 shrink-0 rounded-xl" disabled={!message.trim()}>
+          <Button
+            type="submit"
+            className="h-12 px-6 shrink-0 rounded-xl"
+            disabled={!message.trim() || sendMessage.isPending}
+          >
             <Send className="h-5 w-5" />
           </Button>
         </form>

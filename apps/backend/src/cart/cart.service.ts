@@ -39,6 +39,20 @@ export class CartService {
       throw new NotFoundException('A product or service is required');
     }
 
+    if (dto.productId) {
+      const product = await this.prisma.product.findUnique({
+        where: { id: dto.productId },
+      });
+      if (!product) throw new NotFoundException('Product not found');
+    }
+
+    if (dto.serviceId) {
+      const service = await this.prisma.service.findUnique({
+        where: { id: dto.serviceId },
+      });
+      if (!service) throw new NotFoundException('Service not found');
+    }
+
     const existing = await this.prisma.cartItem.findFirst({
       where: {
         cartId: cart.id,
