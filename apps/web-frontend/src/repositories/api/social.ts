@@ -14,6 +14,11 @@ import { apiClient } from "./client";
 import { NotificationType } from "@/domain/enums";
 
 export class ApiReviewRepository implements ReviewRepository {
+  async getMyReviews(): Promise<Review[]> {
+    const reviews = await apiClient.get<any[]>("/reviews/me");
+    return reviews.map(mapReview);
+  }
+
   async getReviewsByBusinessId(
     businessId: string,
     page = 1,

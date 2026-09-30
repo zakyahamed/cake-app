@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto } from './dto/reviews.dto';
 
@@ -13,16 +17,22 @@ export class ReviewsService {
 
     // Verify the order/booking is completed and belongs to the user
     if (dto.orderId) {
-      const order = await this.prisma.order.findUnique({ where: { id: dto.orderId } });
-      if (!order || order.userId !== userId) throw new NotFoundException('Order not found');
+      const order = await this.prisma.order.findUnique({
+        where: { id: dto.orderId },
+      });
+      if (!order || order.userId !== userId)
+        throw new NotFoundException('Order not found');
       if (order.status !== 'COMPLETED') {
         throw new BadRequestException('Can only review completed orders');
       }
     }
 
     if (dto.bookingId) {
-      const booking = await this.prisma.booking.findUnique({ where: { id: dto.bookingId } });
-      if (!booking || booking.userId !== userId) throw new NotFoundException('Booking not found');
+      const booking = await this.prisma.booking.findUnique({
+        where: { id: dto.bookingId },
+      });
+      if (!booking || booking.userId !== userId)
+        throw new NotFoundException('Booking not found');
       if (booking.status !== 'COMPLETED') {
         throw new BadRequestException('Can only review completed bookings');
       }
@@ -48,7 +58,9 @@ export class ReviewsService {
       return review;
     } catch (error: any) {
       if (error.code === 'P2002') {
-        throw new BadRequestException('You have already reviewed this transaction');
+        throw new BadRequestException(
+          'You have already reviewed this transaction',
+        );
       }
       throw error;
     }
@@ -60,6 +72,13 @@ export class ReviewsService {
       include: {
         user: { select: { id: true, name: true } },
       },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getMyReviews(userId: string) {
+    return this.prisma.review.findMany({
+      where: { userId },
       orderBy: { createdAt: 'desc' },
     });
   }

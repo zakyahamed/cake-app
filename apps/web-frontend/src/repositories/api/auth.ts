@@ -76,4 +76,9 @@ export class ApiAuthRepository implements AuthRepository {
     setRefreshToken(result.refreshToken);
     return this.getCurrentUser() as Promise<User>;
   }
+
+  async updateProfile(data: { name: string; phone: string }): Promise<User> {
+    await apiClient.patch("/users/me", data);
+    return this.getCurrentUser() as Promise<User>;
+  }
 }

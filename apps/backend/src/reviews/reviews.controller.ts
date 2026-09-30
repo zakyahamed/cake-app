@@ -13,6 +13,11 @@ export class ReviewsController {
     return this.reviewsService.create(user.userId, dto);
   }
 
+  @Get('me')
+  getMyReviews(@CurrentUser() user: any) {
+    return this.reviewsService.getMyReviews(user.userId);
+  }
+
   @Public()
   @Get('business/:businessId')
   getBusinessReviews(@Param('businessId') businessId: string) {

@@ -7,7 +7,12 @@ import type {
 } from "@/domain/types";
 
 export interface ReviewRepository {
-  getReviewsByBusinessId(businessId: string, page?: number, limit?: number): Promise<PaginatedResult<Review>>;
+  getMyReviews(): Promise<Review[]>;
+  getReviewsByBusinessId(
+    businessId: string,
+    page?: number,
+    limit?: number,
+  ): Promise<PaginatedResult<Review>>;
   createReview(review: Omit<Review, "id" | "createdAt">): Promise<Review>;
 }
 
