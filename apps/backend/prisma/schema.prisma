@@ -12,6 +12,8 @@ model User {
   email        String    @unique
   passwordHash       String
   hashedRefreshToken String?
+  passwordResetToken String?
+  passwordResetExpiresAt DateTime?
   name               String
   phone        String?
   role         String    @default("CUSTOMER") // CUSTOMER, BUSINESS_OWNER, BUSINESS_STAFF, ADMIN

@@ -8,10 +8,12 @@ import type { ForgotPasswordInput } from "@/domain/schemas";
 import { Button, Input } from "@/components/ui";
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
+import { authRepository } from "@/repositories";
 
 export default function ForgotPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
   const {
     register,
@@ -21,10 +23,10 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: ForgotPasswordInput) => {
     setIsLoading(true);
-    // Mock network request
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const result = await authRepository.requestPasswordReset(data.email);
+    setResetToken(result.resetToken || null);
     setIsLoading(false);
     setIsSuccess(true);
   };
@@ -32,9 +34,12 @@ export default function ForgotPasswordPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#111827] mb-2">Forgot Password</h1>
+        <h1 className="text-2xl font-bold text-[#111827] mb-2">
+          Forgot Password
+        </h1>
         <p className="text-sm text-[#6B7280]">
-          Enter your email address and we&apos;ll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your
+          password.
         </p>
       </div>
 
@@ -50,6 +55,14 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-[#6B7280] mb-6">
               We&apos;ve sent password reset instructions to your email address.
             </p>
+            {resetToken && (
+              <Link
+                href={`/reset-password?token=${resetToken}`}
+                className="mb-6 block text-sm font-medium text-[#0D6E6E] hover:underline"
+              >
+                Open local reset link
+              </Link>
+            )}
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 Return to Login

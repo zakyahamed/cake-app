@@ -18,14 +18,49 @@ export class UsersService {
     return this.prisma.user.create({ data });
   }
 
-  async updateRefreshToken(userId: string, hashedRefreshToken: string | null): Promise<void> {
+  async updateRefreshToken(
+    userId: string,
+    hashedRefreshToken: string | null,
+  ): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
       data: { hashedRefreshToken },
     });
   }
 
-  async updateUser(userId: string, data: Prisma.UserUpdateInput): Promise<User> {
+  async setPasswordResetToken(
+    userId: string,
+    token: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordResetToken: token, passwordResetExpiresAt: expiresAt },
+    });
+  }
+
+  async findPasswordResetCandidates() {
+    return this.prisma.user.findMany({
+      where: { passwordResetToken: { not: null } },
+    });
+  }
+
+  async resetPassword(userId: string, passwordHash: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetExpiresAt: null,
+        hashedRefreshToken: null,
+      },
+    });
+  }
+
+  async updateUser(
+    userId: string,
+    data: Prisma.UserUpdateInput,
+  ): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data,

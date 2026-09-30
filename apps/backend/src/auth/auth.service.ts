@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserRole, UserStatus } from '@cake-app/common';
 
@@ -45,7 +46,7 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+
     if (user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException('Account is not active');
     }
@@ -83,17 +84,59 @@ export class AuthService {
     await this.usersService.updateRefreshToken(userId, null);
   }
 
+  async requestPasswordReset(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user)
+      return {
+        message: 'If the account exists, reset instructions have been created.',
+      };
+    const token = randomBytes(32).toString('hex');
+    await this.usersService.setPasswordResetToken(
+      user.id,
+      await bcrypt.hash(token, 10),
+      new Date(Date.now() + 60 * 60 * 1000),
+    );
+    return { message: 'Reset token created.', resetToken: token };
+  }
+
+  async resetPassword(token: string, password: string) {
+    const candidates = await this.usersService.findPasswordResetCandidates();
+    const user = candidates.find(
+      (candidate) =>
+        candidate.passwordResetToken &&
+        bcrypt.compareSync(token, candidate.passwordResetToken),
+    );
+    if (
+      !user?.passwordResetToken ||
+      !user.passwordResetExpiresAt ||
+      user.passwordResetExpiresAt < new Date()
+    ) {
+      throw new UnauthorizedException('Reset token is invalid or expired');
+    }
+    await this.usersService.resetPassword(
+      user.id,
+      await bcrypt.hash(password, 10),
+    );
+    return { message: 'Password reset successfully' };
+  }
+
   private async generateTokens(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
-    
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION', '15m') as any,
+        expiresIn: this.configService.get<string>(
+          'JWT_ACCESS_EXPIRATION',
+          '15m',
+        ) as any,
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION', '7d') as any,
+        expiresIn: this.configService.get<string>(
+          'JWT_REFRESH_EXPIRATION',
+          '7d',
+        ) as any,
       }),
     ]);
 

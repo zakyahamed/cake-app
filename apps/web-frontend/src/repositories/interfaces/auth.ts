@@ -11,4 +11,8 @@ export interface AuthRepository {
     password: string;
   }): Promise<User>;
   updateProfile(data: { name: string; phone: string }): Promise<User>;
+  requestPasswordReset(
+    email: string,
+  ): Promise<{ message: string; resetToken?: string }>;
+  resetPassword(token: string, password: string): Promise<void>;
 }

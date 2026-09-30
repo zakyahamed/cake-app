@@ -81,4 +81,15 @@ export class ApiAuthRepository implements AuthRepository {
     await apiClient.patch("/users/me", data);
     return this.getCurrentUser() as Promise<User>;
   }
+
+  async requestPasswordReset(email: string) {
+    return apiClient.post<{ message: string; resetToken?: string }>(
+      "/auth/forgot-password",
+      { email },
+    );
+  }
+
+  async resetPassword(token: string, password: string): Promise<void> {
+    await apiClient.post("/auth/reset-password", { token, password });
+  }
 }

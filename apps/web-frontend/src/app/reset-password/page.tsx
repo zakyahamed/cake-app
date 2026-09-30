@@ -7,11 +7,15 @@ import { resetPasswordSchema } from "@/domain/schemas";
 import type { ResetPasswordInput } from "@/domain/schemas";
 import { Button, Input } from "@/components/ui";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { authRepository } from "@/repositories";
 import { CheckCircle2 } from "lucide-react";
 
 export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -21,18 +25,31 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: ResetPasswordInput) => {
     setIsLoading(true);
-    // Mock network request
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setIsLoading(false);
-    setIsSuccess(true);
+    setError(null);
+    try {
+      const token = searchParams.get("token");
+      if (!token) throw new Error("Reset link is missing a token.");
+      await authRepository.resetPassword(token, data.password);
+      setIsSuccess(true);
+    } catch (resetError) {
+      setError(
+        resetError instanceof Error
+          ? resetError.message
+          : "Unable to reset password.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#111827] mb-2">Set New Password</h1>
+        <h1 className="text-2xl font-bold text-[#111827] mb-2">
+          Set New Password
+        </h1>
         <p className="text-sm text-[#6B7280]">
           Please enter your new password below.
         </p>
@@ -48,7 +65,8 @@ export default function ResetPasswordPage() {
               Password reset successful
             </h2>
             <p className="text-sm text-[#6B7280] mb-6">
-              Your password has been reset successfully. You can now sign in with your new password.
+              Your password has been reset successfully. You can now sign in
+              with your new password.
             </p>
             <Link href="/login">
               <Button className="w-full">Sign In</Button>
@@ -56,6 +74,14 @@ export default function ResetPasswordPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <p
+                className="rounded-lg bg-red-50 p-3 text-sm text-red-700"
+                role="alert"
+              >
+                {error}
+              </p>
+            )}
             <Input
               label="New Password"
               type="password"
