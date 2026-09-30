@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
 import { CheckoutDto, UpdateOrderStatusDto } from './dto/orders.dto';
@@ -23,6 +28,19 @@ export class OrdersService {
     else if (firstItem.service) businessId = firstItem.service.businessId;
     else throw new BadRequestException('Invalid cart item');
 
+    if (dto.fulfilmentMethod !== 'PICKUP' && !dto.addressId) {
+      throw new BadRequestException('A delivery address is required');
+    }
+
+    if (dto.addressId) {
+      const address = await this.prisma.address.findUnique({
+        where: { id: dto.addressId },
+      });
+      if (!address || address.userId !== userId) {
+        throw new BadRequestException('Invalid delivery address');
+      }
+    }
+
     // Basic calculation MVP
     let subtotal = 0;
     for (const item of cart.items) {
@@ -30,7 +48,7 @@ export class OrdersService {
       if (item.service) subtotal += item.service.price * item.quantity;
     }
 
-    const deliveryFee = 0;
+    const deliveryFee = dto.fulfilmentMethod === 'PICKUP' ? 0 : 350;
     const total = subtotal + deliveryFee;
 
     // Create Order
@@ -48,15 +66,19 @@ export class OrdersService {
         notes: dto.notes,
         status: 'PENDING_PAYMENT',
         items: {
-          create: cart.items.map(item => ({
+          create: cart.items.map((item) => ({
             productId: item.productId!,
             variantId: item.variantId,
             quantity: item.quantity,
-            priceAtTime: item.product ? item.product.price : (item.service ? item.service.price : 0),
+            priceAtTime: item.product
+              ? item.product.price
+              : item.service
+                ? item.service.price
+                : 0,
             notes: item.notes,
-          }))
-        }
-      }
+          })),
+        },
+      },
     });
 
     // Empty cart
@@ -69,31 +91,50 @@ export class OrdersService {
     return this.prisma.order.findMany({
       where: { userId },
       include: { items: true, business: true },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async getBusinessOrders(userId: string, businessId: string) {
-    const business = await this.prisma.business.findUnique({ where: { id: businessId } });
+    const business = await this.prisma.business.findUnique({
+      where: { id: businessId },
+    });
     if (!business || business.ownerId !== userId) {
       throw new UnauthorizedException('You do not own this business');
     }
     return this.prisma.order.findMany({
       where: { businessId },
       include: { items: true, user: true },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
-  async updateOrderStatus(userId: string, orderId: string, dto: UpdateOrderStatusDto) {
+  async updateOrderStatus(
+    userId: string,
+    orderId: string,
+    dto: UpdateOrderStatusDto,
+  ) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
       include: { business: true },
     });
     if (!order) throw new NotFoundException('Order not found');
 
-    if (order.business.ownerId !== userId) {
-      throw new UnauthorizedException('You do not own this business');
+    const isBusinessOwner = order.business.ownerId === userId;
+    const isCustomer = order.userId === userId;
+
+    if (!isBusinessOwner && !isCustomer) {
+      throw new UnauthorizedException('Access denied');
+    }
+
+    if (isCustomer && !isBusinessOwner) {
+      const cancellableStatuses = ['PENDING_PAYMENT', 'PAID', 'CONFIRMED'];
+      if (
+        dto.status !== 'CANCELLED' ||
+        !cancellableStatuses.includes(order.status)
+      ) {
+        throw new BadRequestException('You can only cancel an eligible order');
+      }
     }
 
     return this.prisma.order.update({

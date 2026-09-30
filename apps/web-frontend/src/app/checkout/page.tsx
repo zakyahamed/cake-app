@@ -45,7 +45,7 @@ export default function CheckoutPage() {
   const [fulfilment, setFulfilment] = useState<FulfilmentMethod>(
     FulfilmentMethod.BUSINESS_DELIVERY,
   );
-  const [address, setAddress] = useState("");
+  const [addressId, setAddressId] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("card");
 
@@ -54,7 +54,7 @@ export default function CheckoutPage() {
     setMounted(true);
     if (user) {
       if (user.addresses.length > 0) {
-        setAddress(user.addresses[0].line1);
+        setAddressId(user.addresses[0].id);
       }
       setPhone(user.phone);
     }
@@ -95,6 +95,8 @@ export default function CheckoutPage() {
     } else {
       const res = await submitOrder.mutateAsync({
         fulfilmentMethod: fulfilment,
+        addressId:
+          fulfilment === FulfilmentMethod.PICKUP ? undefined : addressId,
       });
       if (paymentMethod === "card") {
         const intent = await createPaymentIntent.mutateAsync({
@@ -227,12 +229,29 @@ export default function CheckoutPage() {
                       <label className="block text-sm font-medium text-[#374151] mb-1">
                         Delivery Address
                       </label>
-                      <Input
-                        required
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="123 Main St, Colombo"
-                      />
+                      {user?.addresses.length ? (
+                        <select
+                          required
+                          value={addressId}
+                          onChange={(e) => setAddressId(e.target.value)}
+                          className="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm text-[#111827] focus:border-[#0D6E6E] focus:outline-none focus:ring-2 focus:ring-[#0D6E6E]"
+                        >
+                          <option value="">Select a saved address</option>
+                          {user.addresses.map((savedAddress) => (
+                            <option
+                              key={savedAddress.id}
+                              value={savedAddress.id}
+                            >
+                              {savedAddress.label}: {savedAddress.line1},{" "}
+                              {savedAddress.city}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+                          Add a saved address before choosing delivery.
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
