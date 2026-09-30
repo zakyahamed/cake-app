@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto/products.dto';
 import { Public } from '../common/decorators/public.decorator';
@@ -17,9 +26,20 @@ export class ProductsController {
   @Get()
   findAll(
     @Query('page') page: string = '1',
-    @Query('limit') limit: string = '20'
+    @Query('limit') limit: string = '20',
+    @Query('businessId') businessId?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('search') search?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
   ) {
-    return this.productsService.findAll(+page, +limit);
+    return this.productsService.findAll(+page, +limit, {
+      businessId,
+      categoryId,
+      search,
+      minPrice: minPrice ? +minPrice : undefined,
+      maxPrice: maxPrice ? +maxPrice : undefined,
+    });
   }
 
   @Public()

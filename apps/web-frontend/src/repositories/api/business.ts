@@ -1,31 +1,56 @@
-import type { CategoryRepository, BusinessRepository } from '../interfaces/business';
-import type { Business, BusinessQuery, Category, PaginatedResult } from '@/domain/types';
-import { apiClient } from './client';
+import type {
+  CategoryRepository,
+  BusinessRepository,
+} from "../interfaces/business";
+import type {
+  Business,
+  BusinessQuery,
+  Category,
+  PaginatedResult,
+} from "@/domain/types";
+import { apiClient } from "./client";
 
 export class ApiCategoryRepository implements CategoryRepository {
   async getCategories(): Promise<Category[]> {
-    const cats = await apiClient.get<any[]>('/categories');
-    return cats.map(c => ({
-      id: c.id, slug: c.slug, name: c.name, icon: c.icon,
-      description: '', businessCount: 0,
+    const cats = await apiClient.get<any[]>("/categories");
+    return cats.map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      icon: c.icon,
+      description: "",
+      businessCount: 0,
     }));
   }
 
   async getCategoryBySlug(slug: string): Promise<Category | null> {
     const cats = await this.getCategories();
-    return cats.find(c => c.slug === slug) ?? null;
+    return cats.find((c) => c.slug === slug) ?? null;
   }
 }
 
 export class ApiBusinessRepository implements BusinessRepository {
-  async getBusinesses(query?: BusinessQuery): Promise<PaginatedResult<Business>> {
+  async getBusinesses(
+    query?: BusinessQuery,
+  ): Promise<PaginatedResult<Business>> {
     const params = new URLSearchParams();
-    if (query?.page) params.set('page', String(query.page));
-    if (query?.limit) params.set('limit', String(query.limit));
+    if (query?.page) params.set("page", String(query.page));
+    if (query?.limit) params.set("limit", String(query.limit));
+    if (query?.categoryId) params.set("categoryId", query.categoryId);
+    if (query?.search) params.set("search", query.search);
+    if (query?.city) params.set("city", query.city);
+    if (query?.rating !== undefined) params.set("rating", String(query.rating));
+    if (query?.deliveryOption)
+      params.set("deliveryOption", query.deliveryOption);
     const businesses = await apiClient.get<any[]>(`/businesses?${params}`);
     return {
       data: businesses.map(mapBusiness),
-      meta: { page: query?.page || 1, limit: query?.limit || 20, total: businesses.length, totalPages: 1 },
+      meta: {
+        page: query?.page || 1,
+        limit: query?.limit || 20,
+        total: businesses.length,
+        totalPages: 1,
+      },
     };
   }
 
@@ -33,7 +58,9 @@ export class ApiBusinessRepository implements BusinessRepository {
     try {
       const b = await apiClient.get<any>(`/businesses/${id}`);
       return mapBusiness(b);
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
 
   async getBusinessBySlug(slug: string): Promise<Business | null> {
@@ -46,22 +73,31 @@ export class ApiBusinessRepository implements BusinessRepository {
   }
 
   async searchBusinesses(query: string, limit = 10): Promise<Business[]> {
-    const businesses = await apiClient.get<any[]>(`/search/businesses?q=${encodeURIComponent(query)}&limit=${limit}`);
+    const businesses = await apiClient.get<any[]>(
+      `/search/businesses?q=${encodeURIComponent(query)}&limit=${limit}`,
+    );
     return businesses.map(mapBusiness);
   }
 }
 
 function mapBusiness(b: any): Business {
   return {
-    id: b.id, slug: b.slug, name: b.name, description: b.description || '',
-    logo: b.logoUrl, coverImage: b.coverUrl,
+    id: b.id,
+    slug: b.slug,
+    name: b.name,
+    description: b.description || "",
+    logo: b.logoUrl,
+    coverImage: b.coverUrl,
     categoryIds: (b.businessCategories || []).map((bc: any) => bc.categoryId),
-    location: { address: b.location || '', city: '', district: '' },
-    contactInformation: { phone: b.phone || '', email: b.email },
+    location: { address: b.location || "", city: "", district: "" },
+    contactInformation: { phone: b.phone || "", email: b.email },
     openingHours: [],
-    rating: b.rating || 0, reviewCount: b.reviewCount || 0,
-    verificationStatus: b.status === 'ACTIVE' ? 'VERIFIED' : 'PENDING' as any,
-    deliveryOptions: [], pickupAvailable: b.isPickupAvailable ?? true,
-    featured: false, createdAt: b.createdAt,
+    rating: b.rating || 0,
+    reviewCount: b.reviewCount || 0,
+    verificationStatus: b.status === "ACTIVE" ? "VERIFIED" : ("PENDING" as any),
+    deliveryOptions: [],
+    pickupAvailable: b.isPickupAvailable ?? true,
+    featured: false,
+    createdAt: b.createdAt,
   };
 }

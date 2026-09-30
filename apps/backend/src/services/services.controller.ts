@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { CreateServiceDto, UpdateServiceDto } from './dto/services.dto';
 import { Public } from '../common/decorators/public.decorator';
@@ -17,9 +26,20 @@ export class ServicesController {
   @Get()
   findAll(
     @Query('page') page: string = '1',
-    @Query('limit') limit: string = '20'
+    @Query('limit') limit: string = '20',
+    @Query('businessId') businessId?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('search') search?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
   ) {
-    return this.servicesService.findAll(+page, +limit);
+    return this.servicesService.findAll(+page, +limit, {
+      businessId,
+      categoryId,
+      search,
+      minPrice: minPrice ? +minPrice : undefined,
+      maxPrice: maxPrice ? +maxPrice : undefined,
+    });
   }
 
   @Public()

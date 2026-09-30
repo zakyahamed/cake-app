@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { CreateServiceDto, UpdateServiceDto } from './dto/services.dto';
 
 @Injectable()
@@ -20,10 +25,30 @@ export class ServicesService {
     });
   }
 
-  async findAll(page = 1, limit = 20) {
+  async findAll(
+    page = 1,
+    limit = 20,
+    filters: {
+      businessId?: string;
+      categoryId?: string;
+      search?: string;
+      minPrice?: number;
+      maxPrice?: number;
+    } = {},
+  ) {
     const skip = (page - 1) * limit;
+    const where: Prisma.ServiceWhereInput = { status: 'ACTIVE' };
+    if (filters.businessId) where.businessId = filters.businessId;
+    if (filters.categoryId) where.categoryId = filters.categoryId;
+    if (filters.search)
+      where.OR = [
+        { name: { contains: filters.search } },
+        { description: { contains: filters.search } },
+      ];
+    if (filters.minPrice !== undefined || filters.maxPrice !== undefined)
+      where.price = { gte: filters.minPrice, lte: filters.maxPrice };
     return this.prisma.service.findMany({
-      where: { status: 'ACTIVE' },
+      where,
       skip,
       take: limit,
     });

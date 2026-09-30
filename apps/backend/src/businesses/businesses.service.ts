@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { CreateBusinessDto, UpdateBusinessDto } from './dto/businesses.dto';
 import { UserRole } from '@cake-app/common';
 
@@ -24,9 +25,33 @@ export class BusinessesService {
     return business;
   }
 
-  async findAll() {
+  async findAll(
+    filters: {
+      categoryId?: string;
+      search?: string;
+      city?: string;
+      rating?: number;
+      deliveryOption?: string;
+    } = {},
+  ) {
+    const where: Prisma.BusinessWhereInput = { status: 'ACTIVE' };
+    if (filters.categoryId)
+      where.businessCategories = { some: { categoryId: filters.categoryId } };
+    if (filters.search)
+      where.OR = [
+        { name: { contains: filters.search } },
+        { description: { contains: filters.search } },
+      ];
+    if (filters.city) where.location = { contains: filters.city };
+    if (filters.rating !== undefined) where.rating = { gte: filters.rating };
+    if (filters.deliveryOption === 'PICKUP') where.isPickupAvailable = true;
+    if (
+      filters.deliveryOption === 'BUSINESS_DELIVERY' ||
+      filters.deliveryOption === 'PLATFORM_DELIVERY'
+    )
+      where.isDeliveryAvailable = true;
     return this.prisma.business.findMany({
-      where: { status: 'ACTIVE' },
+      where,
     });
   }
 
@@ -39,7 +64,7 @@ export class BusinessesService {
         businessCategories: true,
         products: true,
         services: true,
-      }
+      },
     });
 
     if (!business) {

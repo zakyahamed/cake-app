@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Patch, Body, Param, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Query,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { BusinessesService } from './businesses.service';
 import { CreateBusinessDto, UpdateBusinessDto } from './dto/businesses.dto';
 import { Public } from '../common/decorators/public.decorator';
@@ -15,8 +24,20 @@ export class BusinessesController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.businessesService.findAll();
+  findAll(
+    @Query('categoryId') categoryId?: string,
+    @Query('search') search?: string,
+    @Query('city') city?: string,
+    @Query('rating') rating?: string,
+    @Query('deliveryOption') deliveryOption?: string,
+  ) {
+    return this.businessesService.findAll({
+      categoryId,
+      search,
+      city,
+      rating: rating ? +rating : undefined,
+      deliveryOption,
+    });
   }
 
   @Public()
