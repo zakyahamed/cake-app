@@ -11,6 +11,14 @@ export interface CategoryRepository {
 }
 
 export interface BusinessRepository {
+  createBusiness(input: {
+    name: string;
+    slug: string;
+    description: string;
+    phone: string;
+    email: string;
+    location: string;
+  }): Promise<Business>;
   getBusinesses(query?: BusinessQuery): Promise<PaginatedResult<Business>>;
   getBusinessById(id: string): Promise<Business | null>;
   getBusinessBySlug(slug: string): Promise<Business | null>;

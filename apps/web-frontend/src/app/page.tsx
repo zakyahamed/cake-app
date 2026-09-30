@@ -4,12 +4,17 @@ import Link from "next/link";
 import { Search, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BusinessCard } from "@/components/discovery/BusinessCard";
-import { useCategories, useFeaturedBusinesses } from "@/features/discovery/hooks";
+import {
+  useCategories,
+  useFeaturedBusinesses,
+} from "@/features/discovery/hooks";
 import { LoadingState } from "@/components/ui/States";
 
 export default function Home() {
-  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
-  const { data: featuredBusinesses = [], isLoading: isLoadingFeatured } = useFeaturedBusinesses(6);
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    useCategories();
+  const { data: featuredBusinesses = [], isLoading: isLoadingFeatured } =
+    useFeaturedBusinesses(6);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -31,7 +36,8 @@ export default function Home() {
             <span className="text-[#F5A623]"> delivered to your door</span>
           </h1>
           <p className="text-base sm:text-lg text-white/80 mb-10 max-w-2xl mx-auto">
-            From homemade cakes to custom jewelry, support local artisans and get unique products delivered same-day.
+            From homemade cakes to custom jewelry, support local artisans and
+            get unique products delivered same-day.
           </p>
 
           <div className="bg-white p-2 rounded-2xl shadow-xl max-w-3xl mx-auto flex flex-col sm:flex-row gap-2">
@@ -65,8 +71,12 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-[#111827]">Explore Categories</h2>
-              <p className="text-[#6B7280] mt-1 text-sm">Find exactly what you need</p>
+              <h2 className="text-2xl font-bold text-[#111827]">
+                Explore Categories
+              </h2>
+              <p className="text-[#6B7280] mt-1 text-sm">
+                Find exactly what you need
+              </p>
             </div>
             <Link
               href="/categories"
@@ -112,8 +122,12 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-[#111827]">Featured Businesses</h2>
-              <p className="text-[#6B7280] mt-1 text-sm">Top rated local favorites</p>
+              <h2 className="text-2xl font-bold text-[#111827]">
+                Featured Businesses
+              </h2>
+              <p className="text-[#6B7280] mt-1 text-sm">
+                Top rated local favorites
+              </p>
             </div>
             <Link
               href="/search"
@@ -144,13 +158,21 @@ export default function Home() {
                 Are you a local business owner?
               </h2>
               <p className="text-white/80 mb-8 text-lg">
-                Join our marketplace to reach thousands of local customers, manage orders easily, and grow your business.
+                Join our marketplace to reach thousands of local customers,
+                manage orders easily, and grow your business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto text-[#0D6E6E] bg-white hover:bg-gray-50">
+                <Link
+                  href="/business/register"
+                  className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-white px-6 text-base font-medium text-[#0D6E6E] transition-all hover:bg-gray-50 sm:w-auto"
+                >
                   Register Business
-                </Button>
-                <Button variant="outline" size="lg" className="w-full sm:w-auto text-[#0D6E6E] border-white/30 hover:bg-white/10 hover:text-white">
+                </Link>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto text-[#0D6E6E] border-white/30 hover:bg-white/10 hover:text-white"
+                >
                   Learn More
                 </Button>
               </div>

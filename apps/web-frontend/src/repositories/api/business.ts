@@ -30,6 +30,17 @@ export class ApiCategoryRepository implements CategoryRepository {
 }
 
 export class ApiBusinessRepository implements BusinessRepository {
+  async createBusiness(input: {
+    name: string;
+    slug: string;
+    description: string;
+    phone: string;
+    email: string;
+    location: string;
+  }): Promise<Business> {
+    return mapBusiness(await apiClient.post("/businesses", input));
+  }
+
   async getBusinesses(
     query?: BusinessQuery,
   ): Promise<PaginatedResult<Business>> {
