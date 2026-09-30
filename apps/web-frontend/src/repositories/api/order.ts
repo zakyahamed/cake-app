@@ -38,7 +38,7 @@ export class ApiOrderRepository implements OrderRepository {
   async createOrder(order: CreateOrderInput): Promise<Order> {
     const result = await apiClient.post<any>("/orders/checkout", {
       fulfilmentMethod: order.fulfilmentMethod,
-      addressId: order.deliveryAddress?.id,
+      addressId: order.addressId,
       scheduledDate: order.scheduledDate,
       scheduledTime: order.scheduledTime,
       notes: order.notes,

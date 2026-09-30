@@ -85,4 +85,18 @@ export class MockAuthRepository implements AuthRepository {
     }
     return newUser;
   }
+
+  async updateProfile(data: { name: string; phone: string }): Promise<User> {
+    const user = await this.getCurrentUser();
+    if (!user) throw new Error("Not authenticated");
+    const updated = { ...user, ...data };
+    users = users.map((item) => (item.id === user.id ? updated : item));
+    return updated;
+  }
+
+  async requestPasswordReset(_email: string) {
+    return { message: "Reset token created.", resetToken: "mock-reset-token" };
+  }
+
+  async resetPassword(_token: string, _password: string): Promise<void> {}
 }

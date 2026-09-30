@@ -13,13 +13,46 @@ function paginate<T>(items: T[], page = 1, limit = 12): PaginatedResult<T> {
 }
 
 export class MockBusinessRepository implements BusinessRepository {
-  async getBusinesses(query?: BusinessQuery): Promise<PaginatedResult<Business>> {
+  async createBusiness(input: {
+    name: string;
+    slug: string;
+    description: string;
+    phone: string;
+    email: string;
+    location: string;
+  }): Promise<Business> {
+    const business: Business = {
+      id: `business-${Date.now()}`,
+      ...input,
+      logo: undefined,
+      coverImage: undefined,
+      categoryIds: [],
+      location: { address: input.location, city: "", district: "" },
+      contactInformation: { phone: input.phone, email: input.email },
+      openingHours: [],
+      rating: 0,
+      reviewCount: 0,
+      verificationStatus: "PENDING",
+      deliveryOptions: [],
+      pickupAvailable: true,
+      featured: false,
+      createdAt: new Date().toISOString(),
+    };
+    mockBusinesses.push(business);
+    return business;
+  }
+
+  async getBusinesses(
+    query?: BusinessQuery,
+  ): Promise<PaginatedResult<Business>> {
     await delay(300);
 
     let results = [...mockBusinesses];
 
     if (query?.categoryId) {
-      results = results.filter((b) => b.categoryIds.includes(query.categoryId!));
+      results = results.filter((b) =>
+        b.categoryIds.includes(query.categoryId!),
+      );
     }
 
     if (query?.search) {
@@ -28,13 +61,15 @@ export class MockBusinessRepository implements BusinessRepository {
         (b) =>
           b.name.toLowerCase().includes(q) ||
           b.description.toLowerCase().includes(q) ||
-          b.location.city.toLowerCase().includes(q)
+          b.location.city.toLowerCase().includes(q),
       );
     }
 
     if (query?.city) {
       const city = query.city.toLowerCase();
-      results = results.filter((b) => b.location.city.toLowerCase().includes(city));
+      results = results.filter((b) =>
+        b.location.city.toLowerCase().includes(city),
+      );
     }
 
     if (query?.rating !== undefined) {
@@ -42,7 +77,9 @@ export class MockBusinessRepository implements BusinessRepository {
     }
 
     if (query?.deliveryOption) {
-      results = results.filter((b) => b.deliveryOptions.includes(query.deliveryOption!));
+      results = results.filter((b) =>
+        b.deliveryOptions.includes(query.deliveryOption!),
+      );
     }
 
     if (query?.featured !== undefined) {
@@ -53,9 +90,11 @@ export class MockBusinessRepository implements BusinessRepository {
       results.sort((a, b) => {
         const dir = query.sortOrder === "asc" ? 1 : -1;
         if (query.sortBy === "rating") return (b.rating - a.rating) * dir;
-        if (query.sortBy === "reviewCount") return (b.reviewCount - a.reviewCount) * dir;
+        if (query.sortBy === "reviewCount")
+          return (b.reviewCount - a.reviewCount) * dir;
         if (query.sortBy === "name") return a.name.localeCompare(b.name) * dir;
-        if (query.sortBy === "createdAt") return a.createdAt.localeCompare(b.createdAt) * dir;
+        if (query.sortBy === "createdAt")
+          return a.createdAt.localeCompare(b.createdAt) * dir;
         return 0;
       });
     }
@@ -86,7 +125,7 @@ export class MockBusinessRepository implements BusinessRepository {
         (b) =>
           b.name.toLowerCase().includes(q) ||
           b.description.toLowerCase().includes(q) ||
-          b.location.city.toLowerCase().includes(q)
+          b.location.city.toLowerCase().includes(q),
       )
       .slice(0, limit);
   }

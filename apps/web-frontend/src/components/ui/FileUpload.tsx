@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { UploadCloud, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/repositories/api/client";
+import { API_BASE_URL, getAccessToken } from "@/repositories/api/client";
 
 interface FileUploadProps {
   onUploadSuccess: (url: string) => void;
@@ -65,11 +65,9 @@ export function FileUpload({
       formData.append("directory", directory);
 
       // Using the base apiClient to handle multipart upload
-      const token = localStorage.getItem("auth-storage") 
-        ? JSON.parse(localStorage.getItem("auth-storage") as string)?.state?.token 
-        : "";
+      const token = getAccessToken() || "";
 
-      const response = await fetch(`${apiClient.defaults.baseURL}/upload`, {
+      const response = await fetch(`${API_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
         headers: {
@@ -150,7 +148,7 @@ export function FileUpload({
             "border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors w-full sm:h-48",
             isDragging
               ? "border-[#0D6E6E] bg-[#0D6E6E]/5"
-              : "border-[#E5E7EB] hover:border-gray-400 hover:bg-gray-50"
+              : "border-[#E5E7EB] hover:border-gray-400 hover:bg-gray-50",
           )}
         >
           <div className="w-12 h-12 rounded-full bg-[#F7F8FA] flex items-center justify-center mb-4">

@@ -34,10 +34,15 @@ function paginate<T>(items: T[], page = 1, limit = 10): PaginatedResult<T> {
 let reviews: Review[] = [...mockReviews];
 
 export class MockReviewRepository implements ReviewRepository {
+  async getMyReviews(): Promise<Review[]> {
+    await delay(150);
+    return [...reviews];
+  }
+
   async getReviewsByBusinessId(
     businessId: string,
     page = 1,
-    limit = 10
+    limit = 10,
   ): Promise<PaginatedResult<Review>> {
     await delay(250);
     const results = reviews
@@ -46,7 +51,9 @@ export class MockReviewRepository implements ReviewRepository {
     return paginate(results, page, limit);
   }
 
-  async createReview(reviewData: Omit<Review, "id" | "createdAt">): Promise<Review> {
+  async createReview(
+    reviewData: Omit<Review, "id" | "createdAt">,
+  ): Promise<Review> {
     await delay(300);
     const newReview: Review = {
       ...reviewData,
@@ -103,7 +110,7 @@ export class MockMessageRepository implements MessageRepository {
     conversations = conversations.map((c) =>
       c.id === conversationId
         ? { ...c, lastMessage: newMessage, updatedAt: now }
-        : c
+        : c,
     );
 
     return newMessage;
@@ -112,10 +119,10 @@ export class MockMessageRepository implements MessageRepository {
   async markConversationAsRead(conversationId: string): Promise<void> {
     await delay(150);
     messages = messages.map((m) =>
-      m.conversationId === conversationId ? { ...m, isRead: true } : m
+      m.conversationId === conversationId ? { ...m, isRead: true } : m,
     );
     conversations = conversations.map((c) =>
-      c.id === conversationId ? { ...c, unreadCount: 0 } : c
+      c.id === conversationId ? { ...c, unreadCount: 0 } : c,
     );
   }
 }
@@ -146,7 +153,7 @@ export class MockNotificationRepository implements NotificationRepository {
   async markAllAsRead(userId: string): Promise<void> {
     await delay(200);
     notifications = notifications.map((n) =>
-      n.userId === userId ? { ...n, isRead: true } : n
+      n.userId === userId ? { ...n, isRead: true } : n,
     );
   }
 }

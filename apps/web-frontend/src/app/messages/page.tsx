@@ -61,7 +61,7 @@ export default function MessagesPage() {
                           {chat.businessName || "Business"}
                         </h4>
                         <p
-                          className={`text-sm mt-0.5 line-clamp-1 ${chat.unread ? "font-medium text-[#111827]" : "text-[#6B7280]"}`}
+                          className={`text-sm mt-0.5 line-clamp-1 ${chat.unreadCount ? "font-medium text-[#111827]" : "text-[#6B7280]"}`}
                         >
                           {chat.lastMessage?.content || "No messages yet"}
                         </p>
