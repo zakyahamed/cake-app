@@ -73,6 +73,30 @@ let conversations: Conversation[] = [...mockConversations];
 let messages: Message[] = [...mockMessages];
 
 export class MockMessageRepository implements MessageRepository {
+  async createConversation(
+    businessId: string,
+    orderId?: string,
+  ): Promise<Conversation> {
+    await delay(150);
+    const existing = conversations.find(
+      (conversation) =>
+        conversation.businessId === businessId &&
+        conversation.relatedOrderId === orderId,
+    );
+    if (existing) return existing;
+    const conversation: Conversation = {
+      id: `conv-${Date.now()}`,
+      customerId: "user-01",
+      businessId,
+      relatedOrderId: orderId,
+      unreadCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    conversations = [conversation, ...conversations];
+    return conversation;
+  }
+
   async getConversations(customerId: string): Promise<Conversation[]> {
     await delay(250);
     return conversations

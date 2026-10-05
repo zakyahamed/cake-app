@@ -17,6 +17,10 @@ export interface ReviewRepository {
 }
 
 export interface MessageRepository {
+  createConversation(
+    businessId: string,
+    orderId?: string,
+  ): Promise<Conversation>;
   getConversations(customerId: string): Promise<Conversation[]>;
   getConversationById(id: string): Promise<Conversation | null>;
   getMessages(conversationId: string): Promise<Message[]>;

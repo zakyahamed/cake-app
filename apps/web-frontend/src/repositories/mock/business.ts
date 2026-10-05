@@ -32,7 +32,7 @@ export class MockBusinessRepository implements BusinessRepository {
       openingHours: [],
       rating: 0,
       reviewCount: 0,
-      verificationStatus: "PENDING",
+      verificationStatus: "PENDING" as Business["verificationStatus"],
       deliveryOptions: [],
       pickupAvailable: true,
       featured: false,

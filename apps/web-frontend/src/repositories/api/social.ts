@@ -48,6 +48,17 @@ export class ApiReviewRepository implements ReviewRepository {
 }
 
 export class ApiMessageRepository implements MessageRepository {
+  async createConversation(
+    businessId: string,
+    orderId?: string,
+  ): Promise<Conversation> {
+    const conversation = await apiClient.post<any>("/messaging/conversations", {
+      businessId,
+      orderId,
+    });
+    return mapConversation(conversation);
+  }
+
   async getConversations(customerId: string): Promise<Conversation[]> {
     const convos = await apiClient.get<any[]>("/messaging/conversations");
     return convos.map(mapConversation);

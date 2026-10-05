@@ -9,7 +9,6 @@ import type {
 export type CreateOrderInput = {
   fulfilmentMethod: Order["fulfilmentMethod"];
   addressId?: string;
-  addressId?: string;
   scheduledDate?: string;
   scheduledTime?: string;
   notes?: string;
